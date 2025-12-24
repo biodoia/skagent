@@ -148,6 +148,15 @@ type Tool interface {
 1. ✅ Creare README.md
 2. ✅ Fix deprecazioni in docs/loader.go
 3. ✅ Aggiungere Context ai tools
-4. ✅ Implementare web search base
-5. ✅ Collegare tool calling al flusso
-6. ✅ Push su GitHub
+4. ✅ Implementare web search base (GitHub + DuckDuckGo)
+5. ✅ Aggiungere retry logic con exponential backoff
+6. ✅ Aggiungere unit tests
+7. ✅ Fix quote extraction bug
+8. ✅ Push su GitHub
+
+## 📊 Stato Attuale
+
+- **Repository**: https://github.com/biodoia/skagent
+- **Tests**: ✅ Tutti passano
+- **Build**: ✅ Compila senza errori
+- **Documentazione**: ✅ README completo
