@@ -178,23 +178,21 @@ func (g *GitHubTool) listRepos(ctx context.Context) (string, error) {
 	return string(output), nil
 }
 
-// extractQuotedArg extracts content within quotes
+// extractQuotedArg extracts content within quotes (double or single)
 func extractQuotedArg(input string) string {
-	start := strings.Index(input, "\"")
-	if start == -1 {
-		start = strings.Index(input, "'")
+	// Try double quotes first
+	if start := strings.Index(input, "\""); start != -1 {
+		end := strings.Index(input[start+1:], "\"")
+		if end != -1 {
+			return input[start+1 : start+1+end]
+		}
 	}
-	if start == -1 {
-		return ""
+	// Try single quotes
+	if start := strings.Index(input, "'"); start != -1 {
+		end := strings.Index(input[start+1:], "'")
+		if end != -1 {
+			return input[start+1 : start+1+end]
+		}
 	}
-
-	end := strings.LastIndex(input, "\"")
-	if end == start {
-		end = strings.LastIndex(input, "'")
-	}
-	if end <= start {
-		return ""
-	}
-
-	return input[start+1 : end]
+	return ""
 }
