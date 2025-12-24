@@ -11,9 +11,9 @@ import (
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/sergio/skagent/internal/ai"
-	"github.com/sergio/skagent/internal/config"
-	"github.com/sergio/skagent/internal/tools"
+	"github.com/biodoia/skagent/internal/ai"
+	"github.com/biodoia/skagent/internal/config"
+	"github.com/biodoia/skagent/internal/tools"
 )
 
 // RequestTimeout for AI and tool operations

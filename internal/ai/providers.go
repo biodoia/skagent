@@ -10,7 +10,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/sergio/skagent/internal/config"
+	"github.com/biodoia/skagent/internal/config"
 )
 
 // Provider interface for different AI backends

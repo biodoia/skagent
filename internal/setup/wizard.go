@@ -9,7 +9,7 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/sergio/skagent/internal/config"
+	"github.com/biodoia/skagent/internal/config"
 )
 
 // Styles

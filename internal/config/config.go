@@ -77,6 +77,54 @@ type ProviderConfig struct {
 	ExtraArgs map[string]string `json:"extra_args,omitempty"`
 }
 
+// APIConfig holds REST API server configuration
+type APIConfig struct {
+	Host         string `json:"host"`
+	Port         int    `json:"port"`
+	EnableCORS   bool   `json:"enable_cors"`
+	EnableAuth   bool   `json:"enable_auth"`
+	RateLimit    int    `json:"rate_limit"`
+	ReadTimeout  int    `json:"read_timeout"`
+	WriteTimeout int    `json:"write_timeout"`
+}
+
+// MCPConfig holds MCP server configuration
+type MCPConfig struct {
+	Host       string `json:"host"`
+	Port       int    `json:"port"`
+	EnableAuth bool   `json:"enable_auth"`
+}
+
+// HeadlessConfig holds headless mode configuration
+type HeadlessConfig struct {
+	Enabled      bool   `json:"enabled"`
+	AutoStart    bool   `json:"auto_start"`
+	PidFile      string `json:"pid_file"`
+	LogLevel     string `json:"log_level"`
+	MaxAgents    int    `json:"max_agents"`
+	Timeout      int    `json:"timeout"`
+	Profile      bool   `json:"profile"`
+	MaxProcs     int    `json:"max_procs"`
+}
+
+// ThemeConfig holds theme configuration
+type ThemeConfig struct {
+	Name              string `json:"name"`
+	AutoSave          bool   `json:"auto_save"`
+	FontSize          int    `json:"font_size"`
+	ShowAnimations    bool   `json:"show_animations"`
+	CompactMode       bool   `json:"compact_mode"`
+}
+
+// ProjectConfig holds project manager integration configuration
+type ProjectConfig struct {
+	Enabled     bool   `json:"enabled"`
+	APIKey      string `json:"api_key,omitempty"`
+	BaseURL     string `json:"base_url,omitempty"`
+	AutoAssign  bool   `json:"auto_assign"`
+	PollInterval int   `json:"poll_interval"`
+}
+
 // Config holds the complete application configuration
 type Config struct {
 	Version         string                    `json:"version"`
@@ -85,14 +133,25 @@ type Config struct {
 	SpecKitPath     string                    `json:"speckit_path,omitempty"`
 	GitHubUser      string                    `json:"github_user,omitempty"`
 	Autonomous      bool                      `json:"autonomous_default"`
-	Theme           string                    `json:"theme"`
+	ThemeName       string                    `json:"theme"`
+	
+	// New configuration sections
+	API        APIConfig        `json:"api"`
+	MCP        MCPConfig        `json:"mcp"`
+	Headless   HeadlessConfig   `json:"headless"`
+	Theme      ThemeConfig      `json:"theme_settings"`
+	Project    ProjectConfig    `json:"project"`
+	
+	// First run tracking
+	FirstRun   bool             `json:"first_run"`
 }
 
 // DefaultConfig returns a new configuration with defaults
 func DefaultConfig() *Config {
 	return &Config{
-		Version:         "1.0.0",
+		Version:         "2.0.0",
 		DefaultProvider: ProviderOpenRouter,
+		FirstRun:        true,
 		Providers: map[Provider]ProviderConfig{
 			ProviderOpenRouter: {
 				Enabled:  true,
@@ -113,7 +172,55 @@ func DefaultConfig() *Config {
 				AuthType: "cli",
 			},
 		},
-		Theme: "catppuccin",
+		ThemeName: "catppuccin",
+		
+		// API configuration
+		API: APIConfig{
+			Host:         "localhost",
+			Port:         8080,
+			EnableCORS:   true,
+			EnableAuth:   false,
+			RateLimit:    100,
+			ReadTimeout:  30,
+			WriteTimeout: 30,
+		},
+		
+		// MCP configuration
+		MCP: MCPConfig{
+			Host:       "localhost",
+			Port:       8081,
+			EnableAuth: false,
+		},
+		
+		// Headless configuration
+		Headless: HeadlessConfig{
+			Enabled:      true,
+			AutoStart:    false,
+			PidFile:      "",
+			LogLevel:     "info",
+			MaxAgents:    10,
+			Timeout:      30,
+			Profile:      false,
+			MaxProcs:     0,
+		},
+		
+		// Theme configuration
+		Theme: ThemeConfig{
+			Name:           "dark",
+			AutoSave:       true,
+			FontSize:       14,
+			ShowAnimations: true,
+			CompactMode:    false,
+		},
+		
+		// Project manager configuration
+		Project: ProjectConfig{
+			Enabled:     false,
+			APIKey:      "",
+			BaseURL:     "",
+			AutoAssign:  false,
+			PollInterval: 30,
+		},
 	}
 }
 
@@ -186,4 +293,64 @@ func (c *Config) GetActiveProvider() ProviderConfig {
 		return cfg
 	}
 	return ProviderConfig{}
+}
+
+// IsFirstRun returns true if this is the first run
+func (c *Config) IsFirstRun() bool {
+	return c.FirstRun
+}
+
+// SetFirstRun sets the first run flag
+func (c *Config) SetFirstRun(firstRun bool) {
+	c.FirstRun = firstRun
+}
+
+// IsHeadlessEnabled returns true if headless mode is enabled
+func (c *Config) IsHeadlessEnabled() bool {
+	return c.Headless.Enabled
+}
+
+// IsAPIEnabled returns true if API server should be enabled
+func (c *Config) IsAPIEnabled() bool {
+	return c.API.Port > 0
+}
+
+// IsMCPEnabled returns true if MCP server should be enabled
+func (c *Config) IsMCPEnabled() bool {
+	return c.MCP.Port > 0
+}
+
+// IsProjectEnabled returns true if project manager integration is enabled
+func (c *Config) IsProjectEnabled() bool {
+	return c.Project.Enabled && c.Project.APIKey != "" && c.Project.BaseURL != ""
+}
+
+// GetTheme returns the current theme configuration
+func (c *Config) GetTheme() ThemeConfig {
+	return c.Theme
+}
+
+// UpdateTheme updates the theme configuration
+func (c *Config) UpdateTheme(theme ThemeConfig) {
+	c.Theme = theme
+}
+
+// GetAPIConfig returns the API configuration
+func (c *Config) GetAPIConfig() APIConfig {
+	return c.API
+}
+
+// GetMCPConfig returns the MCP configuration
+func (c *Config) GetMCPConfig() MCPConfig {
+	return c.MCP
+}
+
+// GetHeadlessConfig returns the headless configuration
+func (c *Config) GetHeadlessConfig() HeadlessConfig {
+	return c.Headless
+}
+
+// GetProjectConfig returns the project manager configuration
+func (c *Config) GetProjectConfig() ProjectConfig {
+	return c.Project
 }
