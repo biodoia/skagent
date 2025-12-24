@@ -1,0 +1,292 @@
+# Piano Generale: SpecKit Agent Manager (skagent)
+
+## Visione Completa
+
+### Architettura Modulare
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    SPECKIT AGENT MANAGER                     │
+├─────────────────────────────────────────────────────────────┤
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐         │
+│  │   TUI Core  │  │  AI Engine  │  │  Tool Mgr   │         │
+│  │ (BubbleTea) │  │ (LLM API)   │  │ (Plugins)   │         │
+│  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘         │
+│         │                │                │                 │
+│  ┌──────┴────────────────┴────────────────┴──────┐         │
+│  │              MESSAGE BUS / STATE              │         │
+│  └──────┬────────────────┬────────────────┬──────┘         │
+│         │                │                │                 │
+│  ┌──────▼──────┐  ┌──────▼──────┐  ┌──────▼──────┐         │
+│  │  SpecKit    │  │   Plandex   │  │  Future...  │         │
+│  │  Adapter    │  │   Adapter   │  │  Adapters   │         │
+│  └─────────────┘  └─────────────┘  └─────────────┘         │
+├─────────────────────────────────────────────────────────────┤
+│  INTEGRATIONS: gh-mcp-server │ Web Search │ Image Render   │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Componenti Completi
+
+1. **TUI Conversazionale** (Charm Stack)
+   - BubbleTea v2 per architettura
+   - Lipgloss per styling
+   - Bubbles per componenti
+   - Huh per forms
+   - Mouse + keyboard support
+   - Image rendering pixelato (x/exp/shiny o termenv)
+
+2. **AI Engine**
+   - Integrazione API Claude/OpenAI
+   - Streaming responses
+   - Context management con documentazione SpecKit
+   - Modalità proattiva e autonoma
+
+3. **Tool Manager (Plugin System)**
+   - Interface standard per adapters
+   - Hot-reload capabilities
+   - Priorità e routing intelligente
+
+4. **Adapters Iniziali**
+   - SpecKit (documentazione + CLI wrapper)
+   - Plandex (planning delegato)
+   - gh-mcp-server (GitHub operations)
+
+5. **Capabilities**
+   - Web search (GitHub, Reddit, docs)
+   - Prototype rendering
+   - Documentation sync automatico
+   - Autonomous mode
+
+## Piano Iper-Semplificato (MVP Funzionale)
+
+### Obiettivo MVP
+> Input: idea progetto → Output: pianificazione completa via SpecKit, repo GitHub creato
+
+### Step-by-Step Implementation
+
+#### STEP 1: Struttura Base
+```
+speckit-agent/
+├── cmd/
+│   └── speckit-agent/
+│       └── main.go
+├── internal/
+│   ├── tui/
+│   │   ├── app.go          # BubbleTea main model
+│   │   ├── chat.go         # Conversational view
+│   │   └── styles.go       # Lipgloss styles
+│   ├── ai/
+│   │   └── client.go       # LLM API client (Claude)
+│   ├── tools/
+│   │   ├── interface.go    # Tool interface
+│   │   ├── speckit.go      # SpecKit wrapper
+│   │   ├── plandex.go      # Plandex wrapper
+│   │   ├── github.go       # gh-mcp-server
+│   │   └── websearch.go    # Web search
+│   └── docs/
+│       └── loader.go       # SpecKit docs loader
+├── docs/                   # Synced SpecKit docs
+├── go.mod
+└── go.sum
+```
+
+#### STEP 2: Dipendenze Go
+```go
+require (
+    github.com/charmbracelet/bubbletea/v2
+    github.com/charmbracelet/bubbles/v2
+    github.com/charmbracelet/lipgloss/v2
+    github.com/charmbracelet/huh
+    github.com/anthropics/anthropic-sdk-go // o openai-go
+)
+```
+
+#### STEP 3: Tool Interface (Plugin System Base)
+```go
+// internal/tools/interface.go
+type Tool interface {
+    Name() string
+    Description() string
+    Execute(ctx context.Context, input string) (string, error)
+    CanHandle(intent string) bool
+}
+
+type ToolManager struct {
+    tools []Tool
+}
+```
+
+#### STEP 4: SpecKit Adapter
+```go
+// internal/tools/speckit.go
+type SpecKitTool struct {
+    docsPath string
+    docs     string // cached documentation
+}
+
+func (s *SpecKitTool) Execute(ctx context.Context, input string) (string, error) {
+    // Wrapper per comandi speckit
+    // Usa la documentazione per generare comandi corretti
+}
+```
+
+#### STEP 5: Plandex Adapter
+```go
+// internal/tools/plandex.go
+type PlandexTool struct{}
+
+func (p *PlandexTool) Execute(ctx context.Context, input string) (string, error) {
+    // Delega pianificazione a plandex
+    // plandex new, plandex tell, etc.
+}
+```
+
+#### STEP 6: GitHub Integration (gh-mcp-server)
+```go
+// internal/tools/github.go
+type GitHubTool struct {
+    mcpEndpoint string
+}
+
+func (g *GitHubTool) Execute(ctx context.Context, input string) (string, error) {
+    // Crea repo, issues, projects via MCP
+}
+```
+
+#### STEP 7: Web Search
+```go
+// internal/tools/websearch.go
+type WebSearchTool struct{}
+
+func (w *WebSearchTool) Execute(ctx context.Context, input string) (string, error) {
+    // Search GitHub repos, Reddit, docs
+    // Ritorna risultati formattati per l'AI
+}
+```
+
+#### STEP 8: AI Client con System Prompt
+```go
+// internal/ai/client.go
+const systemPrompt = `Sei un esperto manager di pianificatori AI.
+Hai accesso a:
+- SpecKit: [documentazione inline]
+- Plandex: per pianificazione dettagliata
+- GitHub: per creare repository e progetti
+- Web Search: per ricerca best practices
+
+Sei PROATTIVO: proponi soluzioni, cerca alternative, suggerisci miglioramenti.
+Modalità AUTONOMA: quando attivata, procedi senza conferme.
+
+Documentazione SpecKit:
+%s
+`
+```
+
+#### STEP 9: TUI Conversazionale
+```go
+// internal/tui/app.go
+type Model struct {
+    messages    []Message
+    input       textinput.Model
+    viewport    viewport.Model
+    ai          *ai.Client
+    tools       *tools.ToolManager
+    autonomous  bool
+}
+
+func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+    // Handle input
+    // Send to AI
+    // Execute tools automatically
+    // Render responses
+}
+```
+
+#### STEP 10: Modalità Autonoma
+```go
+func (m *Model) processAutonomous(idea string) tea.Cmd {
+    return func() tea.Msg {
+        // 1. Analizza idea
+        // 2. Cerca su web per context
+        // 3. Genera piano con SpecKit
+        // 4. Crea repo su GitHub
+        // 5. Delega dettagli a Plandex
+        // 6. Ritorna summary
+    }
+}
+```
+
+### Flusso MVP
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  USER INPUT: "Voglio creare un CLI per gestire dotfiles" │
+└─────────────────────────┬────────────────────────────────┘
+                          ▼
+┌──────────────────────────────────────────────────────────┐
+│  WEB SEARCH: cerca "dotfiles manager" su GitHub          │
+│  → Trova: chezmoi, stow, yadm                            │
+│  → Best practices da Reddit/HN                           │
+└─────────────────────────┬────────────────────────────────┘
+                          ▼
+┌──────────────────────────────────────────────────────────┐
+│  AI ANALYSIS: "Ho trovato questi riferimenti..."         │
+│  → Propone architettura basata su best practices         │
+│  → Genera spec per SpecKit                               │
+└─────────────────────────┬────────────────────────────────┘
+                          ▼
+┌──────────────────────────────────────────────────────────┐
+│  SPECKIT: esegue comandi per creare spec completa        │
+│  → speckit init, speckit add-feature, etc.               │
+└─────────────────────────┬────────────────────────────────┘
+                          ▼
+┌──────────────────────────────────────────────────────────┐
+│  GITHUB: crea repository con struttura iniziale          │
+│  → Via gh-mcp-server                                     │
+└─────────────────────────┬────────────────────────────────┘
+                          ▼
+┌──────────────────────────────────────────────────────────┐
+│  PLANDEX: delega pianificazione dettagliata              │
+│  → Tasks breakdown, milestones                           │
+└─────────────────────────┬────────────────────────────────┘
+                          ▼
+┌──────────────────────────────────────────────────────────┐
+│  OUTPUT: Summary completo + link repo + piano esecutivo  │
+└──────────────────────────────────────────────────────────┘
+```
+
+## Documentazione SpecKit Analizzata
+
+### Comandi Principali
+- `/speckit.constitution`: Stabilisce principi di governance
+- `/speckit.specify`: Definisce requisiti e specifiche
+- `/speckit.plan`: Crea blueprint tecnico
+- `/speckit.tasks`: Genera task list azionabile
+- `/speckit.implement`: Esegue l'implementazione
+
+### Filosofia Core
+"Le specifiche diventano eseguibili, generando direttamente implementazioni funzionanti invece di limitarsi a guidarle."
+
+### Workflow in 6 Fasi
+1. Establish Principles (constitution)
+2. Define Specifications (specify)
+3. Create Technical Plan (plan)
+4. Break into Tasks (tasks)
+5. Validate Plan (analyze)
+6. Execute Implementation (implement)
+
+## Prossimi Passi
+
+1. **Completare l'integrazione con gh-mcp-server** per operazioni GitHub
+2. **Implementare il sistema di web search** utilizzando gli MCP server disponibili
+3. **Creare l'interfaccia TUI conversazionale** con BubbleTea e Lipgloss
+4. **Implementare la modalità autonoma** per l'esecuzione senza interazione
+5. **Testare e raffinare** il flusso completo
+6. **Documentare e pushare** su GitHub
+
+## Note Tecniche
+
+- La versione di Go 1.21.6 sembra avere problemi di compilazione con alcune dipendenze
+- Potrebbe essere necessario utilizzare una versione diversa di Go o aggiustare le dipendenze
+- Il progetto è strutturato in modo modulare per facilitare l'aggiunta di nuovi tool e funzionalità

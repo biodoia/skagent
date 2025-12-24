@@ -1,0 +1,99 @@
+# Piano Iper-Semplificato: SpecKit Agent Manager (skagent)
+
+## Obiettivo MVP
+Creare un sistema che prenda in input un'idea di progetto e la pianifichi completamente da solo utilizzando SpecKit.
+
+## Flusso Minimo
+```
+Input Idea → Web Search → AI Analysis → SpecKit Planning → GitHub Repo Creation → Push
+```
+
+## Componenti Essenziali
+
+### 1. Struttura Base (Completata)
+- Progetto Go con struttura modulare
+- Dipendenze Charmbracelet configurate
+- Interfacce di base per TUI, AI e Tools
+
+### 2. Documentazione SpecKit (Analizzata)
+- Comandi principali identificati
+- Workflow in 6 fasi compreso
+- Filosofia "spec-driven" chiara
+
+### 3. Tool Implementati (Parzialmente)
+- SpecKitTool: Wrapper per comandi SpecKit
+- GitHubTool: Integrazione con gh CLI
+- WebSearchTool: Placeholder per ricerca web
+
+### 4. TUI Conversazionale (Da Completare)
+- Interfaccia testuale interattiva
+- Supporto mouse e tastiera
+- Visualizzazione messaggi AI
+
+### 5. AI Engine (Da Implementare)
+- Integrazione con API Claude/OpenAI
+- System prompt con documentazione SpecKit
+- Modalità proattiva e autonoma
+
+### 6. Modalità Autonoma (Da Implementare)
+- Esecuzione senza interazione
+- Flusso completo automatico
+- Gestione errori e fallback
+
+## Prossimi Passi Immediati
+
+1. **Risolvere problemi di compilazione Go**
+   - Testare con versione diversa di Go
+   - Verificare dipendenze e compatibilità
+   - Creare ambiente di sviluppo isolato
+
+2. **Completare integrazione GitHub**
+   - Configurare gh-mcp-server
+   - Testare creazione repository
+   - Implementare gestione errori
+
+3. **Implementare web search**
+   - Scegliere API di ricerca (Google, GitHub, etc.)
+   - Integrare con MCP server disponibili
+   - Formattare risultati per AI
+
+4. **Creare TUI funzionale**
+   - Completare implementazione BubbleTea
+   - Aggiungere styling con Lipgloss
+   - Testare interazione utente
+
+5. **Integrare AI Engine**
+   - Configurare API key
+   - Implementare system prompt
+   - Testare completamento
+
+6. **Implementare modalità autonoma**
+   - Creare flusso automatico
+   - Gestire errori e fallback
+   - Testare esecuzione completa
+
+## Note Tecniche
+
+- Problemi di compilazione con Go 1.21.6 su WSL
+- Potrebbe essere necessario utilizzare Go 1.20 o versione precedente
+- Verificare compatibilità con dipendenze Charmbracelet
+- Considerare utilizzo di Docker per ambiente isolato
+
+## Risorse Utili
+
+- Documentazione SpecKit: `respeckit/docs/01-spec-driven-development/`
+- Charmbracelet BubbleTea: https://github.com/charmbracelet/bubbletea
+- GitHub CLI: https://cli.github.com/
+- Go Modules: https://golang.org/ref/mod
+
+## Stato Attuale
+
+✅ Struttura progetto creata
+✅ Documentazione SpecKit analizzata
+✅ Interfacce base implementate
+✅ Tool wrapper creati (parzialmente)
+❌ Problemi di compilazione da risolvere
+❌ Integrazioni da completare
+❌ TUI da finalizzare
+❌ AI Engine da implementare
+❌ Modalità autonoma da implementare
